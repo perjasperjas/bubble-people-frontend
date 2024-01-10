@@ -49,8 +49,6 @@ const Home = ({
 
   const { isMobile } = useWindowSize();
 
-  console.log(isMobile);
-
   return (
     <div>
       <Head>
