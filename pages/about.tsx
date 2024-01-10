@@ -20,6 +20,7 @@ type AboutPageContent = {
       images: { data: StrapiImage[] };
       text1: string;
       text2: string;
+      bio: string;
     };
   };
 };
@@ -33,10 +34,10 @@ const About = ({ content }: InferGetStaticPropsType<typeof getStaticProps>) => {
       <main className="about-page">
         <Header />
         <div
-          className="w-screen bg-bg-blue mt-[70px] relative"
+          className="w-screen bg-bg-blue mt-[94px] md:mt-[70px]  relative"
           style={{ minHeight: "calc(100vh - 70px)" }}
         >
-          <div className="md:absolute w-full h-full flex justify-center md:pt-16 z-0">
+          <div className="md:absolute w-full h-full flex flex-col items-center md:pt-16 z-0">
             <div className="w-full lg:w-[800px] h-[500px]">
               <Swiper
                 // install Swiper modules
@@ -59,6 +60,13 @@ const About = ({ content }: InferGetStaticPropsType<typeof getStaticProps>) => {
                   </SwiperSlide>
                 ))}
               </Swiper>
+            </div>
+            <div className="mt-8 px-8 w-full lg:w-[800px] h-[500px]">
+              <p>
+                {content.data.attributes.bio.split("\n").map((text) => (
+                  <p className="text-button text-[18px]">{text}</p>
+                ))}
+              </p>
             </div>
           </div>
           <div className="w-full flex z-10 p-16 pointer-events-none mix-blend-difference saturate-200">

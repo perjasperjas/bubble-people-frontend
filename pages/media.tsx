@@ -5,7 +5,7 @@ import { fetchAPI } from "../lib/api";
 import Image from "next/image";
 import { getYoutubeImage } from "../lib/utils";
 import ReactPlayer from "react-player";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   IoMdPlay,
   IoMdPause,
@@ -15,6 +15,7 @@ import {
 import { Button } from "../components/Button";
 import { StrapiImage } from "../types";
 import { Footer } from "../components/Footer";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 declare global {
   interface Window {
@@ -47,15 +48,40 @@ const Media = ({
   videoItems,
   audioItems,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const playerRef = useRef<ReactPlayer | null>(null);
+  const audioPlayerRef = useRef<ReactPlayer | null>(null);
+  const videoPlayerRef = useRef<ReactPlayer | null>(null);
+  const videoPlayerContainerRef = useRef<HTMLDivElement | null>(null);
+  const [videoPlayerWidth, setVideoPlayerWidth] = useState<number | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioIsPlaying, setAudioIsPlaying] = useState(false);
   const [duration, setDuration] = useState<number | null>(null);
   const [seekTime, setSeekTime] = useState(0);
   const [playIndex, setPlayIndex] = useState(0);
 
-  console.log(audioItems);
+  const [videoUrl, setVideoUrl] = useState(videoItems[0].attributes.link);
+  const [videoIsPlaying, setVideoIsPlaying] = useState(false);
+
+  const listener = useCallback(() => {
+    if (videoPlayerContainerRef.current) {
+      const { width } = videoPlayerContainerRef.current.getBoundingClientRect();
+      setVideoPlayerWidth(Math.max(width));
+    }
+  }, [videoPlayerContainerRef]);
+
+  useEffect(() => {
+    window.addEventListener("resize", listener);
+
+    return () => {
+      document.removeEventListener("resize", listener);
+    };
+  }, [listener]);
+
+  useEffect(() => {
+    listener();
+  }, [listener]);
+
+  const { isMobile } = useWindowSize();
 
   return (
     <div>
@@ -69,7 +95,7 @@ const Media = ({
         <Header />
         <div className="fixed w-screen h-screen top-0 left-0 bg-bg-blue" />
         <div
-          className="w-screen flex flex-col mt-[70px] p-8 absolute"
+          className="w-screen flex flex-col mt-[94px] md:mt-[70px]  p-8 absolute"
           style={{ minHeight: "calc(100vh - 70px)" }}
         >
           <div className="mb-8">
@@ -80,11 +106,11 @@ const Media = ({
             </>
             <ReactPlayer
               key={playIndex}
-              ref={playerRef}
+              ref={audioPlayerRef}
               url={audioItems[playIndex].attributes.HostLink}
               width="100%"
               height="0px"
-              playing={isPlaying}
+              playing={audioIsPlaying}
               onProgress={(time) => setSeekTime(time.playedSeconds)}
               onDuration={(duration) => setDuration(duration)}
               onEnded={() => {
@@ -93,7 +119,7 @@ const Media = ({
                   setPlayIndex((old) => old + 1);
                 } else {
                   setPlayIndex(0);
-                  setIsPlaying(false);
+                  setAudioIsPlaying(false);
                 }
               }}
             />
@@ -102,7 +128,7 @@ const Media = ({
                 <Button
                   className="relative aspect-square h-full flex items-center justify-center shrink-0"
                   onClick={() => {
-                    setIsPlaying((old) => !old);
+                    setAudioIsPlaying((old) => !old);
                   }}
                 >
                   {audioItems[playIndex].attributes.Cover.data && (
@@ -128,10 +154,10 @@ const Media = ({
                     <Button
                       className="!p-0 w-8 h-8 flex items-center justify-center shrink-0 mr-4"
                       onClick={() => {
-                        setIsPlaying((old) => !old);
+                        setAudioIsPlaying((old) => !old);
                       }}
                     >
-                      {isPlaying ? <IoMdPause /> : <IoMdPlay />}
+                      {audioIsPlaying ? <IoMdPause /> : <IoMdPlay />}
                     </Button>
                     <div className="flex justify-end">
                       <Button
@@ -171,12 +197,12 @@ const Media = ({
                             (e.clientX - boundingRect.left) /
                             boundingRect.width;
                           duration && setSeekTime(duration * clickPercentage);
-                          playerRef.current?.seekTo(clickPercentage);
+                          audioPlayerRef.current?.seekTo(clickPercentage);
                         }
                       }}
                     >
                       <div
-                        className={`h-full absolute bg-button`}
+                        className={``}
                         style={{
                           width: duration
                             ? `${(seekTime / duration) * 100}%`
@@ -193,12 +219,36 @@ const Media = ({
             <h1 className="font-title text-glow-heading text-main-glow mb-4">
               video
             </h1>
+            <div className="w-full mb-16" ref={videoPlayerContainerRef}>
+              <ReactPlayer
+                url={videoUrl}
+                controls={true}
+                className="w-auto h-auto"
+                width={videoPlayerWidth ?? 0}
+                height={videoPlayerWidth ? videoPlayerWidth * 0.56 : 0}
+                playing={videoIsPlaying}
+                onPlay={() => setVideoIsPlaying(true)}
+              />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
               {videoItems.map((item) => (
                 <div
                   className="aspect-square bg-main relative group cursor-pointer border-2 border-white"
                   onClick={() => {
-                    window.open(item.attributes.link, "_blank");
+                    setVideoUrl(item.attributes.link);
+                    if (videoPlayerContainerRef.current) {
+                      const top =
+                        videoPlayerContainerRef.current.getBoundingClientRect()
+                          .top;
+
+                      window.scrollTo({
+                        top: window.scrollY - (isMobile ? 128 : 72) + top,
+                        behavior: "smooth",
+                      });
+                      if (videoPlayerRef.current) {
+                        videoPlayerRef.current;
+                      }
+                    }
                   }}
                 >
                   <Image
