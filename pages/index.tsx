@@ -11,11 +11,22 @@ import { getStrapiMedia } from "../lib/media";
 import { StrapiImage } from "../types";
 import { useRef } from "react";
 import { useTrackMousePosition } from "../hooks/usetrackMousePosition";
+import { useWindowSize } from "../hooks/useWindowSize";
 
-type ImagesResponse = {
+type DesktopImagesResponse = {
   data: {
     attributes: {
       HomepageImages: {
+        data: StrapiImage[];
+      };
+    };
+  };
+};
+
+type MobileImagesResponse = {
+  data: {
+    attributes: {
+      HomepageImagesMobile: {
         data: StrapiImage[];
       };
     };
@@ -30,10 +41,15 @@ type ContentResponse = {
   };
 };
 
-const Home = ({ images }: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Home = ({
+  desktopImages: desktopImages,
+  mobileImages: mobileImages,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   const divRef = useRef<HTMLDivElement | null>(null);
 
-  // const { mousePosition, elementRect } = trackMousePosition(divRef);
+  const { isMobile } = useWindowSize();
+
+  console.log(isMobile);
 
   return (
     <div>
@@ -47,7 +63,9 @@ const Home = ({ images }: InferGetStaticPropsType<typeof getStaticProps>) => {
         <div className="mt-[94px] md:mt-[70px]  w-full relative overflow-hidden">
           <div
             className={`absolute w-full h-full y-16 x-16 bg-cover opacity-50 ${
-              images.data.attributes.HomepageImages.data.length > 1
+              (isMobile
+                ? mobileImages.data.attributes.HomepageImagesMobile.data.length
+                : desktopImages.data.attributes.HomepageImages.data.length) > 1
                 ? "animate-pulseBrightness"
                 : ""
             }`}
@@ -55,13 +73,18 @@ const Home = ({ images }: InferGetStaticPropsType<typeof getStaticProps>) => {
               height: "calc(100vh - 70px)",
               backgroundImage: `url(${getStrapiMedia({
                 data: {
-                  attributes:
-                    images.data.attributes.HomepageImages.data[0].attributes,
+                  attributes: (isMobile
+                    ? mobileImages.data.attributes.HomepageImagesMobile
+                    : desktopImages.data.attributes.HomepageImages
+                  ).data[0].attributes,
                 },
               })})`,
             }}
           />
-          {images.data.attributes.HomepageImages.data.length > 1 && (
+          {(isMobile
+            ? mobileImages.data.attributes.HomepageImagesMobile
+            : desktopImages.data.attributes.HomepageImages
+          ).data.length > 1 && (
             <div
               className="absolute w-full h-full y-16 x-16 bg-cover opacity-50 animate-pulseBrightnessAntiPhase"
               style={{
@@ -70,8 +93,10 @@ const Home = ({ images }: InferGetStaticPropsType<typeof getStaticProps>) => {
                 transformOrigin: "center",
                 backgroundImage: `url(${getStrapiMedia({
                   data: {
-                    attributes:
-                      images.data.attributes.HomepageImages.data[1].attributes,
+                    attributes: (isMobile
+                      ? mobileImages.data.attributes.HomepageImagesMobile
+                      : desktopImages.data.attributes.HomepageImages
+                    ).data[1].attributes,
                   },
                 })})`,
                 backgroundPosition: "center",
@@ -99,16 +124,19 @@ const Home = ({ images }: InferGetStaticPropsType<typeof getStaticProps>) => {
 };
 
 export const getStaticProps: GetStaticProps<{
-  images: ImagesResponse;
+  desktopImages: DesktopImagesResponse;
+  mobileImages: MobileImagesResponse;
 }> = async () => {
   // Run API calls in parallel
-  const [imageRes] = await Promise.all([
+  const [desktopImageRes, mobileImageRes] = await Promise.all([
     fetchAPI("/homepage-image", { populate: "*" }),
+    fetchAPI("/homepage-image-mobile", { populate: "*" }),
   ]);
 
   return {
     props: {
-      images: imageRes,
+      desktopImages: desktopImageRes,
+      mobileImages: mobileImageRes,
     },
     revalidate: 1,
   };

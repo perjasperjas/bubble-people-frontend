@@ -7,15 +7,9 @@ export const useWindowSize = () => {
     width: number;
     height: number;
   } | null>(null);
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   const listener = useCallback(() => {
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    if (windowSize?.width && windowSize.width > MOBILE_WIDTH) {
-      setIsMobile(false);
-    } else {
-      setIsMobile(true);
-    }
   }, []);
 
   useEffect(() => {
@@ -28,5 +22,12 @@ export const useWindowSize = () => {
     listener();
   }, [listener]);
 
-  return { size: windowSize, isMobile };
+  return {
+    size: windowSize,
+    isMobile: windowSize
+      ? windowSize.width < MOBILE_WIDTH
+        ? true
+        : false
+      : null,
+  };
 };

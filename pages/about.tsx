@@ -61,7 +61,7 @@ const About = ({ content }: InferGetStaticPropsType<typeof getStaticProps>) => {
                 ))}
               </Swiper>
             </div>
-            <div className="mt-8 px-8 w-full lg:w-[800px] h-[500px]">
+            <div className="mt-8 px-8 w-full lg:w-[800px]">
               <p>
                 {content.data.attributes.bio.split("\n").map((text) => (
                   <p className="text-button text-[18px]">{text}</p>
