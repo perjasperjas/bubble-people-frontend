@@ -99,7 +99,7 @@ h4 {
 }
 
 .text-glow-heading {
-  text-shadow: 0 0 20px #49c2f1;
+  text-shadow: 0 0 8px #49c2f1cc;
 }
 
 .text-glow-button {
@@ -109,7 +109,7 @@ h4 {
 }
 
 .text-glow-button:hover {
-  text-shadow: 0 0 8px #def6ff;
+  text-shadow: 0 0 4px #def6ff;
 }
 
 .noise-bg {

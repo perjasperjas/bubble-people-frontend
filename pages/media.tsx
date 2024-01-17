@@ -100,7 +100,7 @@ const Media = ({
         >
           <div className="mb-8">
             <>
-              <h1 className="font-title text-glow-heading text-main-glow mb-4 md:font-[8px]">
+              <h1 className="font-title font-bold text-glow-heading text-main-glow mb-4 md:font-[8px]">
                 recordings
               </h1>
             </>
@@ -216,7 +216,7 @@ const Media = ({
             </div>
           </div>
           <div className="mb-16">
-            <h1 className="font-title text-glow-heading text-main-glow mb-4">
+            <h1 className="font-title font-bold text-glow-heading text-main-glow mb-4">
               video
             </h1>
             <div className="w-full mb-16" ref={videoPlayerContainerRef}>
