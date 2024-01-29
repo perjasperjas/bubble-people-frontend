@@ -291,13 +291,13 @@ export const getStaticProps: GetStaticProps<{
   const sortedAudioItems = (audioItemsRes.data as MediaAudioItem[]).sort(
     (a, b) => a.attributes.Index - b.attributes.Index
   );
-  const sortedVideoItems = (audioItemsRes.data as MediaVideoItem[]).sort(
+  const sortedVideoItems = (videoItemsRes.data as MediaVideoItem[]).sort(
     (a, b) => a.attributes.Index - b.attributes.Index
   );
 
   return {
     props: {
-      videoItems: videoItemsRes.data as MediaVideoItem[],
+      videoItems: sortedVideoItems,
       audioItems: sortedAudioItems,
     },
     revalidate: 1,
