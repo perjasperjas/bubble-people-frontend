@@ -1,21 +1,22 @@
-import type { GetStaticProps, InferGetStaticPropsType } from "next";
+import type { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  IoMdPause,
-  IoMdPlay,
-  IoMdSkipBackward,
-  IoMdSkipForward,
-} from "react-icons/io";
-import ReactPlayer from "react-player";
-import { Button } from "../components/Button";
-import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
-import { useWindowSize } from "../hooks/useWindowSize";
 import { fetchAPI } from "../lib/api";
-import { getStrapiMedia } from "../lib/media";
+import Image from "next/image";
+import { getYoutubeImage } from "../lib/utils";
+import ReactPlayer from "react-player";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  IoMdPlay,
+  IoMdPause,
+  IoMdSkipForward,
+  IoMdSkipBackward,
+} from "react-icons/io";
+import { Button } from "../components/Button";
 import { StrapiImage } from "../types";
+import { Footer } from "../components/Footer";
+import { useWindowSize } from "../hooks/useWindowSize";
+import { getStrapiMedia } from "../lib/media";
 
 declare global {
   interface Window {
@@ -26,7 +27,7 @@ declare global {
 type MediaVideoItem = {
   attributes: {
     title: string;
-    thumbnail: StrapiImage;
+    thumbnail: { data: StrapiImage };
     link: string;
     Index: number;
   };
@@ -252,10 +253,14 @@ const Media = ({
                   }}
                 >
                   <Image
-                    src={getStrapiMedia(item.attributes.thumbnail)}
+                    src={
+                      item.attributes.thumbnail.data
+                        ? item.attributes.thumbnail.data.attributes.url
+                        : getYoutubeImage(item.attributes.link)
+                    }
                     layout="fill"
                     objectFit="cover"
-                    className="md:blur-sm transition-all duration-500 group-hover:blur-none"
+                    className="transition-all duration-500"
                   />
                   <div className="h-full w-full flex items-center justify-center relative text-glow-heading text-white">
                     <h1 className="transition-all duration-500 text-glow md:opacity-0 md:translate-y-[100px] md:group-hover:translate-y-0 group-hover:opacity-100 text-[36px] sm:text-[36px] md:text-[32px] lg:text-[48px]">

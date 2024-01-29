@@ -28,7 +28,6 @@ type AboutPageContent = {
 SwiperCore.use([Pagination, Autoplay]);
 
 const About = ({ content }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  console.log(content);
   return (
     <div>
       <main className="about-page">
