@@ -1,21 +1,21 @@
-import type { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
-import { Header } from "../components/Header";
-import { fetchAPI } from "../lib/api";
 import Image from "next/image";
-import { getYoutubeImage } from "../lib/utils";
-import ReactPlayer from "react-player";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  IoMdPlay,
   IoMdPause,
-  IoMdSkipForward,
+  IoMdPlay,
   IoMdSkipBackward,
+  IoMdSkipForward,
 } from "react-icons/io";
+import ReactPlayer from "react-player";
 import { Button } from "../components/Button";
-import { StrapiImage } from "../types";
 import { Footer } from "../components/Footer";
+import { Header } from "../components/Header";
 import { useWindowSize } from "../hooks/useWindowSize";
+import { fetchAPI } from "../lib/api";
+import { getStrapiMedia } from "../lib/media";
+import { StrapiImage } from "../types";
 
 declare global {
   interface Window {
@@ -252,7 +252,7 @@ const Media = ({
                   }}
                 >
                   <Image
-                    src={getYoutubeImage(item.attributes.link)}
+                    src={getStrapiMedia(item.attributes.thumbnail)}
                     layout="fill"
                     objectFit="cover"
                     className="md:blur-sm transition-all duration-500 group-hover:blur-none"
