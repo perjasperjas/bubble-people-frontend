@@ -1,16 +1,9 @@
-import type { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
-import Head from "next/head";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
+import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
+import { ShopCard } from "../components/ShopCard";
 import { fetchAPI } from "../lib/api";
 import { StrapiImage } from "../types";
-import Image from "next/image";
-import { getStrapiMedia } from "../lib/media";
-import { imageConfigDefault } from "next/dist/shared/lib/image-config";
-import { Button } from "../components/Button";
-import { utimesSync } from "fs";
-import { ShopCard } from "../components/ShopCard";
-import { GLSLCanvas } from "../components/GLSLCanvas";
-import { Footer } from "../components/Footer";
 
 export type ShopItem = {
   attributes: {
@@ -22,6 +15,7 @@ export type ShopItem = {
     title: string;
     updatedAt: string;
     link: string;
+    Index: number;
   };
 };
 
@@ -61,9 +55,13 @@ export const getStaticProps: GetStaticProps<{
     fetchAPI("/shop-items", { populate: "*" }),
   ]);
 
+  const sortedShopItems = (shopItemRes.data as ShopItem[]).sort(
+    (a, b) => a.attributes.Index - b.attributes.Index
+  );
+
   return {
     props: {
-      shopItems: shopItemRes.data as ShopItem[],
+      shopItems: sortedShopItems,
     },
     revalidate: 1,
   };
