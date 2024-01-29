@@ -28,7 +28,7 @@ type MediaVideoItem = {
     title: string;
     thumbnail: StrapiImage;
     link: string;
-    index: number;
+    Index: number;
   };
 };
 
@@ -283,9 +283,10 @@ export const getStaticProps: GetStaticProps<{
     fetchAPI("/media-audio-items", { populate: "*" }),
   ]);
 
-  console.log({ blahhhh: JSON.stringify(audioItemsRes) });
-
   const sortedAudioItems = (audioItemsRes.data as MediaAudioItem[]).sort(
+    (a, b) => a.attributes.Index - b.attributes.Index
+  );
+  const sortedVideoItems = (audioItemsRes.data as MediaVideoItem[]).sort(
     (a, b) => a.attributes.Index - b.attributes.Index
   );
 
